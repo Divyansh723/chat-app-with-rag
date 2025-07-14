@@ -68,6 +68,9 @@ python app.py
 
 Visit `http://localhost:5000` in your browser.
 
+## 📜 License
+
+MIT License
 ---
 
 **Built with ❤️ using LangChain + Gemini + ChromaDB**
