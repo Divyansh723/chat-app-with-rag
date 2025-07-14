@@ -151,7 +151,7 @@ model.bind_tools(tools)
 
 # SQLite-based checkpointer
 session_conn = sqlite3.connect(
-    r"D:\langchain\langchain-academy\module-2\state_db\session_and_history.db",
+    r"session_and_history.db",
     check_same_thread=False
 )
 session = SqliteSaver(conn=session_conn)
