@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <title>Upload PDF - Ask Tempest</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='upload.css') }}" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet" />
+</head>
+
+<body>
+    {% with messages = get_flashed_messages(with_categories=true) %} {% if
+    messages %}
+    <div id="toast-container">
+        {% for category, message in messages %}
+        <div class="toast {{ category }}">{{ message }}</div>
+        {% endfor %}
+    </div>
+    {% endif %} {% endwith %}
+
+    <div class="upload-container">
+        <div class="upload-header">
+            <h1>📤 Upload PDF to Memory</h1>
+            <p>
+                Your uploaded document will be chunked, embedded, and stored as
+                retrievable memory.
+            </p>
+        </div>
+
+        <form action="/process_upload" method="POST" enctype="multipart/form-data" class="upload-form">
+            <input type="file" name="file" accept=".pdf,.txt" required class="upload-input" />
+            <button type="submit" class="upload-btn">Upload Now</button>
+        </form>
+
+        <div class="upload-footer">
+            <a href="{{ url_for('chat') }}" class="back-btn">← Back to Chat</a>
+        </div>
+    </div>
+    <script>
+        setTimeout(() => {
+            const toasts = document.querySelectorAll(".toast");
+            toasts.forEach((toast) => (toast.style.display = "none"));
+        }, 3000);
+    </script>
+</body>
+
+</html>

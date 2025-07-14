@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <title>Ask Tempest - AI Assistant</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}" />
+</head>
+
+<body>
+    <div class="chat-container">
+        <!-- Header -->
+        <div class="chat-header">
+            <div class="header-left">
+                <div class="ai-avatar"><i class="fas fa-robot"></i></div>
+                <div class="title-section">
+                    <h1>Ask Tempest</h1>
+                    <p>Your AI Assistant • Online</p>
+                </div>
+            </div>
+            <div class="header-actions">
+                <button class="action-btn" onclick="toggleTheme()" title="Toggle Theme">
+                    <i class="fas fa-moon"></i>
+                </button>
+
+                {% if summary %}
+                <button class="action-btn" onclick="toggleSummary()" title="Toggle Summary">
+                    <i class="fas fa-clipboard-list"></i>
+                </button>
+                {% endif %}
+
+                <div class="options-dropdown">
+                    <button class="action-btn" onclick="toggleOptions()" title="More Options">
+                        <i class="fas fa-ellipsis-v"></i>
+                    </button>
+                    <div class="options-menu" id="options-menu" style="display: none">
+                        <a href="{{ url_for('upload_page') }}" class="dropdown-item">📤 Upload PDF</a>
+                        <a class="dropdown-item" href="/download/txt">
+                            <i class="fas fa-file-lines"></i> <span>Download TXT</span>
+                        </a>
+                        <a class="dropdown-item" href="/download/pdf">
+                            <i class="fas fa-file-pdf"></i> <span>Download PDF</span>
+                        </a>
+                        <a class="dropdown-item" href="/download/summary">
+                            <i class="fas fa-clipboard"></i> <span>Download Summary</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Chat Messages -->
+        <div class="chat-messages" id="chat-messages">
+            {% for sender, message in conversation %}
+            <div class="message-bubble {% if sender == 'You' %}user{% endif %}">
+                {% if sender == 'Tempest' %}
+                <div class="message-avatar bot-avatar">
+                    <i class="fas fa-robot"></i>
+                </div>
+                <div class="message-content bot-message">
+                    <strong>Tempest</strong>
+                    <div>{{ message }}</div>
+                    <div class="message-time">Just now</div>
+                </div>
+                {% else %}
+                <div class="message-content user-message">
+                    <strong>You</strong>
+                    <div>{{ message }}</div>
+                    <div class="message-time">Just now</div>
+                </div>
+                <div class="message-avatar user-avatar">
+                    <i class="fas fa-user"></i>
+                </div>
+                {% endif %}
+            </div>
+            {% endfor %}
+        </div>
+
+        <!-- Summary Panel -->
+        {% if summary %}
+        <div class="summary-panel" id="summary-panel" style="display: none;">
+            <div class="summary-title"><i class="fas fa-clipboard-list"></i> Conversation Summary</div>
+            <div id="summary-content">{{ summary }}</div>
+        </div>
+        {% endif %}
+
+
+        <!-- Chat Input -->
+        <div class="chat-input-container">
+            <form class="input-wrapper" method="POST" action="/" id="chat-form">
+                <textarea class="message-input" placeholder="Type your message here..." rows="1" name="message"
+                    id="message-input" required></textarea>
+                <button type="submit" class="send-button">
+                    <i class="fas fa-paper-plane"></i>
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script>
+        // Apply saved theme on load
+        window.onload = function () {
+            const savedTheme = localStorage.getItem("theme");
+            if (savedTheme === "dark") {
+                document.body.classList.add("dark-mode");
+            }
+
+            const chatBox = document.getElementById("chat-messages");
+            if (chatBox) {
+                chatBox.scrollTop = chatBox.scrollHeight;
+            }
+        };
+
+        function toggleTheme() {
+            document.body.classList.toggle("dark-mode");
+            const isDark = document.body.classList.contains("dark-mode");
+            localStorage.setItem("theme", isDark ? "dark" : "light");
+        }
+
+        function toggleSummary() {
+            const panel = document.getElementById("summary-panel");
+            if (panel) {
+                panel.style.display = panel.style.display === "none" ? "block" : "none";
+            }
+        }
+
+        function toggleOptions() {
+            const menu = document.getElementById("options-menu");
+            menu.style.display = (menu.style.display === "none" || menu.style.display === "") ? "block" : "none";
+        }
+
+        function takeScreenshot() {
+            html2canvas(document.querySelector(".chat-container")).then(canvas => {
+                const link = document.createElement('a');
+                link.download = 'chat_screenshot.png';
+                link.href = canvas.toDataURL();
+                link.click();
+            });
+        }
+        const input = document.getElementById("message-input");
+        const form = document.getElementById("chat-form");
+
+        input.addEventListener("keydown", function (e) {
+            if (e.key === "Enter" && !e.shiftKey) {
+                e.preventDefault(); // prevent newline
+                form.submit(); // submit the form
+            }
+        });
+
+        // Close options dropdown if clicked outside
+        document.addEventListener("click", function (e) {
+            const menu = document.getElementById("options-menu");
+            const button = e.target.closest(".action-btn");
+            if (!menu.contains(e.target) && !button) {
+                menu.style.display = "none";
+            }
+        });
+    </script>
+
+</body>
+
+</html>
